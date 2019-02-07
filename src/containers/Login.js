@@ -8,13 +8,13 @@ export default class Login extends Component {
     super(props);
 
     this.state = {
-      email: "",
+      olmId: "",
       password: ""
     };
   }
 
   validateForm() {
-    return this.state.email.length > 0 && this.state.password.length > 0;
+    return this.state.olmId.length > 0 && this.state.password.length > 0;
   }
 
   handleChange = event => {
@@ -27,8 +27,23 @@ export default class Login extends Component {
     event.preventDefault();
 
     try {
-      //   await Auth.signIn(this.state.email, this.state.password);
-      alert("Logged in");
+      const rawResponse = await fetch("http://localhost:443/api/user/login", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          password: this.state.password,
+          olmId: this.state.olmId
+        })
+      });
+      const user = await rawResponse.json();
+      if (user.status.code === 500) {
+        alert(user.status.message);
+      } else {
+        alert("User LoggedIn");
+      }
     } catch (e) {
       alert(e.message);
     }
@@ -38,12 +53,12 @@ export default class Login extends Component {
     return (
       <div className="Login">
         <form onSubmit={this.handleSubmit}>
-          <FormGroup controlId="email" bsSize="large">
-            <ControlLabel>Email</ControlLabel>
+          <FormGroup controlId="olmId" bsSize="large">
+            <ControlLabel>olmId</ControlLabel>
             <FormControl
               autoFocus
-              type="email"
-              value={this.state.email}
+              type="text"
+              value={this.state.olmId}
               onChange={this.handleChange}
             />
           </FormGroup>

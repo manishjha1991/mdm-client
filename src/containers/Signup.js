@@ -146,6 +146,7 @@ export default class Signup extends Component {
   }
 
   render() {
+    console.log(this.state.newUser);
     return (
       <div className="Signup">
         {this.state.newUser === null

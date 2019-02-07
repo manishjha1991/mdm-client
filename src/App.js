@@ -1,8 +1,7 @@
 import React, { Component, Fragment } from "react";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { Nav, Navbar, NavItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
-
 import Routes from "./Routes";
 import "./App.css";
 
@@ -18,8 +17,11 @@ class App extends Component {
     try {
       // We Need To Save That Into Localstorage
       let chekLoggedIn = localStorage.getItem("isLogin");
-      console.log(chekLoggedIn, "CHECK_LOGGED_IN");
-      this.userHasAuthenticated(true);
+      if (chekLoggedIn) {
+        this.userHasAuthenticated(true);
+      } else {
+        this.userHasAuthenticated(false);
+      }
     } catch (e) {
       if (e !== "No current user") {
         alert(e);
@@ -32,44 +34,50 @@ class App extends Component {
   userHasAuthenticated = authenticated => {
     this.setState({ isAuthenticated: authenticated });
   };
-  handleLogout = event => {
+  handleLogout = async event => {
+    localStorage.setItem("isLogin", "");
+
     this.userHasAuthenticated(false);
+    this.props.history.push("/login");
   };
   render() {
     const childProps = {
       isAuthenticated: this.state.isAuthenticated,
       userHasAuthenticated: this.userHasAuthenticated
     };
+
     return (
-      <div className="App container">
-        <Navbar fluid collapseOnSelect>
-          <Navbar.Header>
-            <Navbar.Brand>
-              <Link to="/">Airtel</Link>
-            </Navbar.Brand>
-            <Navbar.Toggle />
-          </Navbar.Header>
-          <Navbar.Collapse>
-            <Nav pullRight>
-              {this.state.isAuthenticated ? (
-                <NavItem onClick={this.handleLogout}>Logout</NavItem>
-              ) : (
-                <Fragment>
-                  <LinkContainer to="/signup">
-                    <NavItem>Signup</NavItem>
-                  </LinkContainer>
-                  <LinkContainer to="/login">
-                    <NavItem>Login</NavItem>
-                  </LinkContainer>
-                </Fragment>
-              )}
-            </Nav>
-          </Navbar.Collapse>
-        </Navbar>
-        <Routes childProps={childProps} />
-      </div>
+      !this.state.isAuthenticating && (
+        <div className="App container">
+          <Navbar fluid collapseOnSelect>
+            <Navbar.Header>
+              <Navbar.Brand>
+                <Link to="/">Airtel Home MDM</Link>
+              </Navbar.Brand>
+              <Navbar.Toggle />
+            </Navbar.Header>
+            <Navbar.Collapse>
+              <Nav pullRight>
+                {this.state.isAuthenticated ? (
+                  <NavItem onClick={this.handleLogout}>Logout</NavItem>
+                ) : (
+                  <Fragment>
+                    <LinkContainer to="/signup">
+                      <NavItem>Signup</NavItem>
+                    </LinkContainer>
+                    <LinkContainer to="/login">
+                      <NavItem>Login</NavItem>
+                    </LinkContainer>
+                  </Fragment>
+                )}
+              </Nav>
+            </Navbar.Collapse>
+          </Navbar>
+          <Routes childProps={childProps} />
+        </div>
+      )
     );
   }
 }
 
-export default App;
+export default withRouter(App);

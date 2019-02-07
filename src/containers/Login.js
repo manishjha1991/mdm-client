@@ -8,6 +8,7 @@ export default class Login extends Component {
     super(props);
 
     this.state = {
+      isLoading: false,
       olmId: "",
       password: ""
     };
@@ -25,7 +26,7 @@ export default class Login extends Component {
 
   handleSubmit = async event => {
     event.preventDefault();
-
+    this.setState({ isLoading: true });
     try {
       const rawResponse = await fetch("http://localhost:443/api/user/login", {
         method: "POST",
@@ -44,6 +45,7 @@ export default class Login extends Component {
       } else {
         localStorage.setItem("isLogin", true);
         this.props.userHasAuthenticated(true);
+        this.props.history.push("/");
       }
     } catch (e) {
       alert(e.message);

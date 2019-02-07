@@ -15,6 +15,7 @@ export default class Signup extends Component {
     this.state = {
       isLoading: false,
       email: "",
+      olmId: "",
       password: "",
       confirmPassword: "",
       confirmationCode: "",
@@ -45,7 +46,31 @@ export default class Signup extends Component {
 
     this.setState({ isLoading: true });
 
-    this.setState({ newUser: "test" });
+    try {
+      const rawResponse = await fetch("http://localhost:443/api/user", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          emailId: this.state.email,
+          password: this.state.password,
+          olmId: this.state.olmId
+        })
+      });
+      const newUser = await rawResponse.json();
+
+      if (newUser.status.code === 500) {
+        alert(newUser.status.message);
+      } else {
+        this.setState({
+          newUser
+        });
+      }
+    } catch (e) {
+      alert(e.message);
+    }
 
     this.setState({ isLoading: false });
   };
@@ -91,6 +116,15 @@ export default class Signup extends Component {
             autoFocus
             type="email"
             value={this.state.email}
+            onChange={this.handleChange}
+          />
+        </FormGroup>
+        <FormGroup controlId="olmId" bsSize="large">
+          <ControlLabel>OlmId</ControlLabel>
+          <FormControl
+            autoFocus
+            type="text"
+            // value={this.state.olmId}
             onChange={this.handleChange}
           />
         </FormGroup>

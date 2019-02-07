@@ -6,6 +6,7 @@ import {
   ControlLabel
 } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
+import NotFound from "./NotFound";
 import "./Signup.css";
 
 export default class Signup extends Component {
@@ -26,14 +27,15 @@ export default class Signup extends Component {
   validateForm() {
     return (
       this.state.email.length > 0 &&
+      this.state.olmId.length > 0 &&
       this.state.password.length > 0 &&
       this.state.password === this.state.confirmPassword
     );
   }
 
-  validateConfirmationForm() {
-    return this.state.confirmationCode.length > 0;
-  }
+  //   validateConfirmationForm() {
+  //     return this.state.confirmationCode.length > 0;
+  //   }
 
   handleChange = event => {
     this.setState({
@@ -82,29 +84,7 @@ export default class Signup extends Component {
   };
 
   renderConfirmationForm() {
-    return (
-      <form onSubmit={this.handleConfirmationSubmit}>
-        <FormGroup controlId="confirmationCode" bsSize="large">
-          <ControlLabel>Confirmation Code</ControlLabel>
-          <FormControl
-            autoFocus
-            type="tel"
-            value={this.state.confirmationCode}
-            onChange={this.handleChange}
-          />
-          <HelpBlock>Please check your email for the code.</HelpBlock>
-        </FormGroup>
-        <LoaderButton
-          block
-          bsSize="large"
-          disabled={!this.validateConfirmationForm()}
-          type="submit"
-          isLoading={this.state.isLoading}
-          text="Verify"
-          loadingText="Verifying…"
-        />
-      </form>
-    );
+    return <NotFound />;
   }
 
   renderForm() {

@@ -66,9 +66,11 @@ export default class Signup extends Component {
       if (newUser.status.code === 500) {
         alert(newUser.status.message);
       } else {
+        localStorage.setItem("isLogin", true);
         this.setState({
           newUser
         });
+        this.props.history.push("/");
       }
     } catch (e) {
       alert(e.message);

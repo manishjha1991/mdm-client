@@ -15,7 +15,6 @@ class App extends Component {
   }
   async componentDidMount() {
     try {
-      // We Need To Save That Into Localstorage
       let chekLoggedIn = localStorage.getItem("isLogin");
       if (chekLoggedIn) {
         this.userHasAuthenticated(true);
@@ -27,7 +26,6 @@ class App extends Component {
         alert(e);
       }
     }
-
     this.setState({ isAuthenticating: false });
   }
 
@@ -59,7 +57,15 @@ class App extends Component {
             <Navbar.Collapse>
               <Nav pullRight>
                 {this.state.isAuthenticated ? (
-                  <NavItem onClick={this.handleLogout}>Logout</NavItem>
+                  <Fragment>
+                    <NavItem onClick={this.handleLogout}>Logout</NavItem>
+                    <LinkContainer to="/device">
+                      <NavItem>Device</NavItem>
+                    </LinkContainer>
+                    <LinkContainer to="/update">
+                      <NavItem>Update</NavItem>
+                    </LinkContainer>
+                  </Fragment>
                 ) : (
                   <Fragment>
                     <LinkContainer to="/signup">

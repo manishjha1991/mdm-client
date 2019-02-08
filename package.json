@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@babel/core": "^7.2.2",
+    "axios": "^0.18.0",
     "babel-core": "^6.26.3",
     "lodash": "^4.17.11",
     "mdbreact": "^4.10.0",

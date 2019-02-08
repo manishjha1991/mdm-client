@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Form, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import Select from "react-select";
-import { uniqBy } from "lodash";
+import axios, { post } from "axios";
 import LoaderButton from "../components/LoaderButton";
 import customStyles from "../components/Select";
 import "./Form.css";
@@ -11,6 +11,8 @@ export default class Update extends Component {
     super(props);
 
     this.state = {
+      file: "",
+      isLoading: null,
       isCircleSelected: false,
       isCenterSelected: false,
       isStoreSelected: false,
@@ -112,6 +114,27 @@ export default class Update extends Component {
       })
     });
   };
+  fileUpload(file) {
+    const url = `${apiUrl}/store/upload`;
+    const formData = new FormData();
+    formData.append("file", file);
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data"
+      }
+    };
+    return post(url, formData, config);
+  }
+  handleWalpaper = event => {
+    this.setState({ file: event.target.files[0] });
+    this.fileUpload(event.target.files[0]);
+  };
+
+  handleSubmit = async event => {
+    event.preventDefault();
+
+    this.setState({ isLoading: true });
+  };
   validateForm() {
     console.log(this.state.selectedCenter.value);
     return (
@@ -123,10 +146,9 @@ export default class Update extends Component {
     );
   }
   render() {
-    console.log(this.state);
     return (
       <div className="Home">
-        <Form>
+        <Form onSubmit={this.handleSubmit}>
           <FormGroup controlId="cnter" bsSize="large">
             <ControlLabel>Select Center</ControlLabel>
             <Select
@@ -183,6 +205,14 @@ export default class Update extends Component {
               isMulti
             />
           </FormGroup>
+          <FormGroup>
+            <input
+              className="value"
+              type="file"
+              onChange={this.handleWalpaper}
+            />
+          </FormGroup>
+
           <LoaderButton
             block
             bsSize="large"

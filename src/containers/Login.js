@@ -43,7 +43,9 @@ export default class Login extends Component {
       if (user.status.code === 500) {
         alert(user.status.message);
       } else {
+        console.log(user, "User");
         localStorage.setItem("isLogin", true);
+        localStorage.setItem("olmId", user.result[0].olmId);
         this.props.userHasAuthenticated(true);
         this.props.history.push("/");
       }

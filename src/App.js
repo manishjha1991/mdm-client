@@ -10,13 +10,17 @@ class App extends Component {
     super(props);
 
     this.state = {
-      isAuthenticated: false
+      isAuthenticated: false,
+      olmId: ""
     };
   }
   async componentDidMount() {
     try {
       let chekLoggedIn = localStorage.getItem("isLogin");
+
       if (chekLoggedIn) {
+        const getOlmId = localStorage.getItem("olmId");
+        this.setState({ olmId: getOlmId });
         this.userHasAuthenticated(true);
       } else {
         this.userHasAuthenticated(false);
@@ -26,6 +30,7 @@ class App extends Component {
         alert(e);
       }
     }
+
     this.setState({ isAuthenticating: false });
   }
 
@@ -41,7 +46,8 @@ class App extends Component {
   render() {
     const childProps = {
       isAuthenticated: this.state.isAuthenticated,
-      userHasAuthenticated: this.userHasAuthenticated
+      userHasAuthenticated: this.userHasAuthenticated,
+      olmId: this.state.olmId
     };
 
     return (
@@ -50,7 +56,11 @@ class App extends Component {
           <Navbar fluid collapseOnSelect>
             <Navbar.Header>
               <Navbar.Brand>
-                <Link to="/">Airtel Home MDM</Link>
+                <Link to="/">
+                  {this.state.olmId
+                    ? `Welcome ${this.state.olmId}`
+                    : `Welcome Guest`}
+                </Link>
               </Navbar.Brand>
               <Navbar.Toggle />
             </Navbar.Header>

@@ -19,7 +19,13 @@ export default class Update extends Component {
       apps: [],
       selectedApps: [],
       circles: [],
-      selectedCircles: []
+      selectedCircles: "",
+      stores: [],
+      selectedStores: "",
+      groups: [],
+      selectedGroups: "",
+      browsers: [],
+      selectedbrowsers: []
     };
   }
 
@@ -28,42 +34,92 @@ export default class Update extends Component {
     const getAllCenterJson = await getAllCenter.json();
     const getAllApps = await fetch(`${apiUrl}/app`);
     let getAllAppsJson = await getAllApps.json();
+    const getAllBrowser = await fetch(`${apiUrl}/browser`);
+    let getAllBrowserJson = await getAllBrowser.json();
+    const getAllGroups = await fetch(`${apiUrl}/group`);
+    let getAllGroupsJson = await getAllGroups.json();
     this.setState({
       centers: await getAllCenterJson.result.map(center => {
         return { value: center.centerId, label: center.centerName };
       }),
       apps: await getAllAppsJson.result.map((app, index) => {
-        return { value: index, label: app };
+        return { value: index.toString(), label: app };
+      }),
+      groups: await getAllGroupsJson.result.map(group => {
+        return { value: group.groupId, label: group.groupName };
+      }),
+      browsers: await getAllBrowserJson.result.map((browser, index) => {
+        return { value: index.toString(), label: browser };
       })
     });
   }
 
   getCenter = async selectedCenter => {
     this.setState({ selectedCenter });
-    console.log(`Option selected:`, selectedCenter);
+
     const getAllCircleFromCenter = await fetch(
       `${apiUrl}/store/${selectedCenter.value}/center`
     );
     let getAllCircleJson = await getAllCircleFromCenter.json();
-    console.log(getAllCircleJson, "selectedCircles");
+
     this.setState({
       circles: await getAllCircleJson.result.map(circle => {
         return { value: circle.circleId, label: circle.circleId };
       })
     });
   };
+  getStores = selectedStores => {
+    this.setState({ selectedStores });
+  };
   getApps = selectedApps => {
     this.setState({ selectedApps });
-    console.log(`Option selectedApps:`, selectedApps);
   };
-  getCircles = selectedCircles => {
+  getBrowser = selectedbrowsers => {
+    this.setState({ selectedbrowsers });
+  };
+
+  getGroups = async selectedGroups => {
+    this.setState({ selectedGroups });
+
+    const getAllAppsFromGroup = await fetch(
+      `${apiUrl}/app/${selectedGroups.value}`
+    );
+    const getAllBrowserFromGroup = await fetch(
+      `${apiUrl}/browser/${selectedGroups.value}`
+    );
+    let getAllBrowserJson = await getAllBrowserFromGroup.json();
+    let getAllAppJson = await getAllAppsFromGroup.json();
+    this.setState({
+      selectedApps: await getAllAppJson.result.map(app => {
+        return { value: app.appId, label: app.appName };
+      }),
+      selectedbrowsers: await getAllBrowserJson.result.map(browser => {
+        return { value: browser._id, label: browser.browserName };
+      })
+    });
+  };
+
+  getCircles = async selectedCircles => {
     this.setState({ selectedCircles });
-    console.log(`Option selectedCircles:`, selectedCircles);
+    const getAllStoreFromCircle = await fetch(
+      `${apiUrl}/store/${selectedCircles.value}/circle`
+    );
+    let getAllStoreJson = await getAllStoreFromCircle.json();
+
+    this.setState({
+      stores: await getAllStoreJson.result.map(store => {
+        return { value: store.storeId, label: store.storeId };
+      })
+    });
   };
   validateForm() {
+    console.log(this.state.selectedCenter.value);
     return (
-      this.state.selectedCenter.length > 0 &&
-      this.state.selectedCenter.length > 0
+      this.state.selectedCenter.value &&
+      this.state.selectedApps.length > 0 &&
+      this.state.selectedCircles.value &&
+      this.state.selectedGroups.value > 0 &&
+      this.state.selectedStores.value > 0
     );
   }
   render() {
@@ -87,21 +143,24 @@ export default class Update extends Component {
               value={this.state.selectedCircles}
               onChange={this.getCircles}
               options={this.state.circles}
-              isMulti
             />
           </FormGroup>
           <FormGroup controlId="store" bsSize="large">
             <ControlLabel>Select Store</ControlLabel>
-            <FormControl />
+            <Select
+              styles={customStyles}
+              value={this.state.selectedStores}
+              onChange={this.getStores}
+              options={this.state.stores}
+            />
           </FormGroup>
           <FormGroup controlId="group" bsSize="large">
             <ControlLabel>Select Group</ControlLabel>
             <Select
               styles={customStyles}
-              value={this.state.selectedCenter}
-              onChange={this.handleChange}
-              options={this.state.centers}
-              isMulti
+              value={this.state.selectedGroups}
+              onChange={this.getGroups}
+              options={this.state.groups}
             />
           </FormGroup>
           <FormGroup controlId="apps" bsSize="large">
@@ -115,12 +174,14 @@ export default class Update extends Component {
             />
           </FormGroup>
           <FormGroup controlId="cnter" bsSize="large">
-            <ControlLabel>Browser</ControlLabel>
-            <FormControl />
-          </FormGroup>
-          <FormGroup controlId="cnter" bsSize="large">
             <ControlLabel>Add Browser</ControlLabel>
-            <FormControl />
+            <Select
+              styles={customStyles}
+              value={this.state.selectedbrowsers}
+              onChange={this.getBrowser}
+              options={this.state.browsers}
+              isMulti
+            />
           </FormGroup>
           <LoaderButton
             block

@@ -11,10 +11,15 @@ export default class Update extends Component {
     super(props);
 
     this.state = {
+      isCircleSelected: false,
+      isCenterSelected: false,
+      isStoreSelected: false,
       centers: [],
       selectedCenter: "",
       apps: [],
-      selectedApps: []
+      selectedApps: [],
+      circles: [],
+      selectedCircles: []
     };
   }
 
@@ -33,13 +38,27 @@ export default class Update extends Component {
     });
   }
 
-  getCenter = selectedCenter => {
+  getCenter = async selectedCenter => {
     this.setState({ selectedCenter });
     console.log(`Option selected:`, selectedCenter);
+    const getAllCircleFromCenter = await fetch(
+      `${apiUrl}/store/${selectedCenter.value}/center`
+    );
+    let getAllCircleJson = await getAllCircleFromCenter.json();
+    console.log(getAllCircleJson, "selectedCircles");
+    this.setState({
+      circles: await getAllCircleJson.result.map(circle => {
+        return { value: circle.circleId, label: circle.circleId };
+      })
+    });
   };
   getApps = selectedApps => {
     this.setState({ selectedApps });
-    console.log(`Option selected:`, selectedApps);
+    console.log(`Option selectedApps:`, selectedApps);
+  };
+  getCircles = selectedCircles => {
+    this.setState({ selectedCircles });
+    console.log(`Option selectedCircles:`, selectedCircles);
   };
   validateForm() {
     return (
@@ -63,7 +82,13 @@ export default class Update extends Component {
           </FormGroup>
           <FormGroup controlId="circle" bsSize="large">
             <ControlLabel>Select Circle</ControlLabel>
-            <FormControl />
+            <Select
+              styles={customStyles}
+              value={this.state.selectedCircles}
+              onChange={this.getCircles}
+              options={this.state.circles}
+              isMulti
+            />
           </FormGroup>
           <FormGroup controlId="store" bsSize="large">
             <ControlLabel>Select Store</ControlLabel>

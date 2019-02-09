@@ -146,6 +146,7 @@ export default class Update extends Component {
     );
   }
   render() {
+    console.log(this.props, "___________");
     return (
       <div className="Home">
         <Form onSubmit={this.handleSubmit}>
@@ -212,15 +213,15 @@ export default class Update extends Component {
               onChange={this.handleWalpaper}
             />
           </FormGroup>
-
           <LoaderButton
             block
+            bsStyle="success"
             bsSize="large"
             disabled={!this.validateForm()}
             type="submit"
             isLoading={this.state.isLoading}
-            text="Submit"
-            loadingText="Submitting…"
+            text="Save"
+            loadingText="Saving…"
           />
         </Form>
       </div>

@@ -5,6 +5,7 @@ import {
   Button,
   ListGroup,
   ListGroupItem,
+  ButtonGroup,
   Col
 } from "reactstrap";
 import "./Home.css";
@@ -56,22 +57,25 @@ export default class Home extends Component {
               </ListGroupItem>
               <ListGroupItem>
                 <b>Apps</b>
-                <ListGroupItem>
+
+                <ButtonGroup aria-label="Basic example">
                   {note.selectedApps.map(app => {
                     return <Button bsStyle="success">{app.appName}</Button>;
                   })}
-                </ListGroupItem>
+                </ButtonGroup>
               </ListGroupItem>
-              <ListGroupItem>{}</ListGroupItem>
+
               <ListGroupItem>
                 <b>Browser</b>
               </ListGroupItem>
               <ListGroupItem>
-                {note.selectedBrowser.map(browser => {
-                  return (
-                    <Button bsStyle="success">{browser.browserName}</Button>
-                  );
-                })}
+                <ButtonGroup aria-label="Basic example">
+                  {note.selectedBrowser.map(browser => {
+                    return (
+                      <Button bsStyle="success">{browser.browserName}</Button>
+                    );
+                  })}
+                </ButtonGroup>
               </ListGroupItem>
             </ListGroup>
           </Card>

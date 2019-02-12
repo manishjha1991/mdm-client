@@ -11,6 +11,7 @@
     "mdbreact": "^4.10.0",
     "react": "^16.7.0",
     "react-bootstrap": "^0.32.4",
+    "react-bootstrap-dialog": "^0.11.0",
     "react-bootstrap-multiselect": "^2.4.1",
     "react-bootstrap-select": "^0.14.0",
     "react-dom": "^16.7.0",

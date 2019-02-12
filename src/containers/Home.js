@@ -27,7 +27,7 @@ export default class Home extends Component {
       device: getAllStoreJson.result
     });
   }
-  walpaper =
+  defaultWalpaper =
     "https://s3-ap-southeast-1.amazonaws.com/bsy/iportal/images/airtel-logo-white-text-horizontal.jpg";
   render() {
     return this.state.device.map((note, i) => (
@@ -37,7 +37,11 @@ export default class Home extends Component {
             <CardImg
               style={{ width: "100%" }}
               variant="top"
-              src={this.walpaper}
+              src={
+                this.state.device.walpaper
+                  ? this.state.device.walpaper
+                  : this.defaultWalpaper
+              }
             />
             <ListGroup className="list-group-flush">
               <ListGroupItem>
@@ -80,7 +84,6 @@ export default class Home extends Component {
             </ListGroup>
           </Card>
         </Col>
-        {/* </div> */}
       </div>
     ));
   }

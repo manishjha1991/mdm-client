@@ -1,9 +1,10 @@
 import React, { Component } from "react";
-import { Form, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
+import { Form, FormGroup, ControlLabel } from "react-bootstrap";
 import Select from "react-select";
-import axios, { post } from "axios";
+import { post } from "axios";
 import LoaderButton from "../components/LoaderButton";
 import customStyles from "../components/Select";
+import SampleCode from "../components/Model";
 import "./Form.css";
 let apiUrl = "http://localhost:443/api";
 export default class Update extends Component {
@@ -27,7 +28,9 @@ export default class Update extends Component {
       groups: [],
       selectedGroups: "",
       browsers: [],
-      selectedbrowsers: []
+      successFlag: false,
+      selectedBrowsers: [],
+      wallpaper: ""
     };
   }
 
@@ -57,7 +60,7 @@ export default class Update extends Component {
   }
 
   getCenter = async selectedCenter => {
-    this.setState({ selectedCenter });
+    this.setState({ selectedCenter, isCenterSelected: true });
 
     const getAllCircleFromCenter = await fetch(
       `${apiUrl}/store/${selectedCenter.value}/center`
@@ -71,13 +74,13 @@ export default class Update extends Component {
     });
   };
   getStores = selectedStores => {
-    this.setState({ selectedStores });
+    this.setState({ selectedStores, isStoreSelected: true });
   };
   getApps = selectedApps => {
     this.setState({ selectedApps });
   };
-  getBrowser = selectedbrowsers => {
-    this.setState({ selectedbrowsers });
+  getBrowser = selectedBrowsers => {
+    this.setState({ selectedBrowsers });
   };
 
   getGroups = async selectedGroups => {
@@ -95,14 +98,14 @@ export default class Update extends Component {
       selectedApps: await getAllAppJson.result.map(app => {
         return { value: app.appId, label: app.appName };
       }),
-      selectedbrowsers: await getAllBrowserJson.result.map(browser => {
+      selectedBrowsers: await getAllBrowserJson.result.map(browser => {
         return { value: browser._id, label: browser.browserName };
       })
     });
   };
 
   getCircles = async selectedCircles => {
-    this.setState({ selectedCircles });
+    this.setState({ selectedCircles, isCircleSelected: true });
     const getAllStoreFromCircle = await fetch(
       `${apiUrl}/store/${selectedCircles.value}/circle`
     );
@@ -126,17 +129,111 @@ export default class Update extends Component {
     return post(url, formData, config);
   }
   handleWalpaper = event => {
-    this.setState({ file: event.target.files[0] });
+    this.setState({ wallpaper: event.target.files[0] });
     this.fileUpload(event.target.files[0]);
   };
 
   handleSubmit = async event => {
     event.preventDefault();
+    let data = {
+      wallpaper: this.state.wallpaper,
+      groupName: this.state.selectedGroups.label,
+      selectedApps: [],
+      selectedBrowser: []
+    };
+    this.state.selectedApps.forEach(app => {
+      data.selectedApps.push({
+        appId: app.value,
+        appName: app.label,
+        appLink: app.appLink,
+        isPlayStore: app.isPlayStore
+      });
+    });
+    this.state.selectedBrowsers.forEach(app => {
+      data.selectedBrowser.push({
+        browserName: app.label,
+        browserId: app.value,
+        browserLink: app.appLink
+      });
+    });
+    console.log(data, "___________");
+    if (
+      this.state.isCenterSelected &&
+      !this.state.isCircleSelected &&
+      !this.state.isStoreSelected
+    ) {
+      fetch(`${apiUrl}/store/${this.state.center.value}/center`, {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        mode: "cors",
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then(data => {
+          this.showSuccess();
+        })
+        .catch(error => alert(error));
+    }
 
+    // IF ONLY CENTER AND CIRCLE  SELECTED THAT MEANS NEED TO UPDATE FROM CIRCLE
+
+    if (this.state.isCircleSelected && !this.state.storeId) {
+      console.log("CENTER AND CIRCLE");
+      fetch(`${apiUrl}/store/${this.state.circles.value}/circle`, {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        mode: "cors",
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then(data => {
+          this.showSuccess();
+        })
+        .catch(error => alert(error));
+    }
+
+    // IF CENTER , CIRCLE AND STORE SELECTED THAT MEANS NEED TO UPDATE FROM STORE
+
+    if (
+      this.state.isStoreSelected &&
+      this.state.isCircleSelected &&
+      this.state.isCenterSelected
+    ) {
+      console.log("CENTER AND CIRCLE AND STORE");
+      fetch(`${apiUrl}/store/${this.state.selectedStores.value}`, {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        mode: "cors",
+        body: JSON.stringify(data)
+      })
+        .then(response => response.json())
+        .then(data => {
+          this.showSuccess();
+        })
+        .catch(error => alert(error));
+    }
     this.setState({ isLoading: true });
   };
+  showSuccess() {
+    this.setState({
+      successFlag: true,
+      store: "",
+      device: "",
+      wallpaper: "",
+      selectedGroups: []
+    });
+    setTimeout(() => this.setState({ successFlag: false }), 2000);
+  }
   validateForm() {
-    console.log(this.state.selectedCenter.value);
     return (
       this.state.selectedCenter.value &&
       this.state.selectedApps.length > 0 &&
@@ -146,7 +243,7 @@ export default class Update extends Component {
     );
   }
   render() {
-    console.log(this.props, "___________");
+    console.log(this.state);
     return (
       <div className="Home">
         <Form onSubmit={this.handleSubmit}>
@@ -200,7 +297,7 @@ export default class Update extends Component {
             <ControlLabel>Add Browser</ControlLabel>
             <Select
               styles={customStyles}
-              value={this.state.selectedbrowsers}
+              value={this.state.selectedBrowsers}
               onChange={this.getBrowser}
               options={this.state.browsers}
               isMulti
@@ -213,6 +310,7 @@ export default class Update extends Component {
               onChange={this.handleWalpaper}
             />
           </FormGroup>
+          <SampleCode />
           <LoaderButton
             block
             bsStyle="success"
